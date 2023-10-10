@@ -5,56 +5,68 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 5f;
-    public float rotationSpeed = 90f;
-
-    public float accelerationFactor = 30f;
+    [Header("Car settings")]
+    public float accelerationFactor = 15f;
     public float turnFactor = 3.5f;
+    public float driftFactor = 0.95f;
+    public float maxSpeed = 20;
 
     private float accelerationInput = 0;
     private float steeringInput = 0;
-
     private float rotationAngle = 0f;
+    private float velocityVsUp = 0f;
 
     private Rigidbody carRigidBody;
 
-    void Awake()
+    private void Awake()
     {
         carRigidBody = GetComponent<Rigidbody>();
-    }
-    
-    private void Update()
-    {
-        // var horizontalInput = Input.GetAxis("Horizontal");
-        // var verticalInput = Input.GetAxis("Vertical");
-        //
-        // var movement = new Vector3(0.0f, 0.0f, verticalInput) * moveSpeed * Time.deltaTime;
-        // transform.Translate(movement);
-        //
-        // var rotationAmount = horizontalInput * rotationSpeed * Time.deltaTime;
-        // transform.Rotate(Vector3.up, rotationAmount);
     }
 
     private void FixedUpdate()
     {
-        CarRun();
+        Drive();
         
-        CarSteer();
+        KillOrthogonalVelocity();
+        
+        Steer();
     }
 
-    private void CarRun()
+    private void Drive()
     {
+        velocityVsUp = Vector3.Dot(transform.forward, carRigidBody.velocity);
+
+        if (velocityVsUp > maxSpeed && accelerationInput > 0)
+        {
+            return;
+        }
+
+        if (velocityVsUp < -maxSpeed * 0.5f && accelerationInput < 0)
+        {
+            return;
+        }
+        
         var carRunVector = transform.forward * accelerationInput * accelerationFactor;
         
         carRigidBody.AddForce(carRunVector, ForceMode.Force);
-        
     }
 
-    private void CarSteer()
+    private void Steer()
     {
-        rotationAngle += steeringInput * turnFactor;
+        var minSpeedBeforeAllowTurningFactor = (carRigidBody.velocity.magnitude / 8);
+        minSpeedBeforeAllowTurningFactor = Mathf.Clamp01(minSpeedBeforeAllowTurningFactor);
+        
+        rotationAngle += steeringInput * turnFactor * minSpeedBeforeAllowTurningFactor;
         
         carRigidBody.MoveRotation(Quaternion.Euler(0, rotationAngle, 0));
+    }
+
+    private void KillOrthogonalVelocity()
+    {
+        var forwardVelocity = transform.forward * Vector3.Dot(carRigidBody.velocity, transform.forward);
+        var rightVelocity = transform.right * Vector3.Dot(carRigidBody.velocity, transform.right);
+
+        carRigidBody.velocity = forwardVelocity + rightVelocity * driftFactor;
     }
     
 

@@ -4918,10 +4918,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 246ee907a8d07b34e8cf6d7b2dbfce4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  rotationSpeed: 90
-  accelerationFactor: 30
+  accelerationFactor: 15
   turnFactor: 3.5
+  driftFactor: 0.95
 --- !u!54 &1030568476
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4931,7 +4930,7 @@ Rigidbody:
   m_GameObject: {fileID: 1030568473}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0
+  m_Drag: 1
   m_AngularDrag: 0.1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -4956,7 +4955,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1030568473}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: de7e9c6c3aa3c4a4f981aa70bb719127, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
