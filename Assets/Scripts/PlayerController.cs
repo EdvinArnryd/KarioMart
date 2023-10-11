@@ -6,17 +6,21 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Car settings")]
-    public float accelerationFactor = 15f;
+    public float accelerationFactor = 12f;
     public float turnFactor = 3.5f;
     public float driftFactor = 0.95f;
-    public float maxSpeed = 20;
+    public float maxSpeed = 15f;
 
-    private float accelerationInput = 0;
-    private float steeringInput = 0;
+    private float accelerationInput = 0f;
+    private float steeringInput = 0f;
     private float rotationAngle = 0f;
     private float velocityVsUp = 0f;
 
     private Rigidbody carRigidBody;
+
+    private float speedBoost = 1f;
+    private float boostTimer = 0f;
+    private bool boosting = false;
 
     private void Awake()
     {
@@ -45,10 +49,30 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
+
+        if (boosting)
+        {
+            boostTimer += Time.deltaTime;
+            if (boostTimer >= 2)
+            {
+                speedBoost = 1f;
+                boostTimer = 0;
+                boosting = false;
+            }
+        }
         
-        var carRunVector = transform.forward * accelerationInput * accelerationFactor;
+        var carRunVector = transform.forward * accelerationInput * accelerationFactor * speedBoost;
         
         carRigidBody.AddForce(carRunVector, ForceMode.Force);
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "SpeedBoost")
+        {
+            boosting = true;
+            speedBoost = 1.5f;
+        }
     }
 
     private void Steer()
