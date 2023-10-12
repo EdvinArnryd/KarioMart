@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class CarLapCounter : MonoBehaviour
@@ -17,12 +19,22 @@ public class CarLapCounter : MonoBehaviour
 
     public event Action<CarLapCounter> OnPassCheckPoint;
 
+    public String name;
+    
+    public GameObject winnerPanel;
     private void OnTriggerEnter(Collider colliderPoint)
     {
 
         if (isRaceCompleted)
         {
-            Debug.Log("The game is over you won!");
+            winnerPanel.SetActive(true);
+            Transform childTransform = winnerPanel.transform.GetChild(0);
+
+            TextMeshProUGUI textMeshPro = childTransform.GetComponent<TextMeshProUGUI>();
+
+            textMeshPro.text = "You win " + name + "!";
+            
+            Time.timeScale = 0;
             return;
         }
         
@@ -46,11 +58,17 @@ public class CarLapCounter : MonoBehaviour
                     if (lapsCompleted >= lapsToComplete)
                     {
                         isRaceCompleted = true;
+                        
                     }
                 }
                 
                 OnPassCheckPoint?.Invoke(this);
             }
         }
+    }
+
+    private void OnWin(TextMeshProUGUI panel)
+    {
+        panel.text = "Player " + name + " has won!";
     }
 }
